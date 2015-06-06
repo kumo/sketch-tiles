@@ -1,0 +1,112 @@
+var tileLayer = function(layer, tileWidth, tileHeight) {
+
+  var extraLayerCount = 0 // keep track of how many tiles we create
+
+  var layerFrame = layer.frame()
+
+  var layerPosX = layerFrame.x()
+  var layerPosY = layerFrame.y()
+  var layerBoundsX = layerPosX + layerFrame.width()
+  var layerBoundsY = layerPosY + layerFrame.height()
+
+  // do we need to create this tile on the right?
+  if (layerPosX < 0) {
+    extraLayerCount++
+    rLayer = layer.duplicate()
+
+    var rLayerFrame = rLayer.frame()
+
+    rLayerFrame.setX(tileWidth + layerPosX)
+
+    rLayer.setName(rLayer.name() + " {R}")
+  }
+
+  // do we need to create this tile on the bottom?
+  if (layerPosY < 0) {
+    extraLayerCount++
+    bLayer = layer.duplicate()
+
+    var bLayerFrame = bLayer.frame()
+
+    bLayerFrame.setY(tileHeight + layerPosY)
+
+    bLayer.setName(bLayer.name() + " {B}")
+  }
+
+  // do we need to create this tile on the left?
+  if (layerBoundsX > tileWidth) {
+    extraLayerCount++
+    lLayer = layer.duplicate()
+
+    var lLayerFrame = lLayer.frame()
+
+    lLayerFrame.setX(layerPosX - tileWidth)
+
+    lLayer.setName(lLayer.name() + " {L}")
+  }
+
+  // do we need to create this tile on the top?
+  if (layerBoundsY > tileHeight) {
+    extraLayerCount++
+    tLayer = layer.duplicate()
+
+    var tLayerFrame = tLayer.frame()
+
+    tLayerFrame.setY(layerPosY - tileHeight)
+
+    tLayer.setName(tLayer.name() + " {T}")
+  }
+
+  return extraLayerCount
+}
+
+var onRun = function(context) {
+  var doc = context.document
+  var selectionCount = context.selection.count()
+
+  if (selectionCount == 0) {
+    doc.showMessage("Nothing selected.")
+    return
+  }
+
+  var tile = context.selection[0]
+
+  var layerCount = tile.layers().count()
+  if (layerCount == 0) {
+    doc.showMessage("Tile is empty.")
+    return
+  }
+
+  var tileFrame = tile.frame()
+
+  var tileWidth = tileFrame.width()
+  var tileHeight = tileFrame.height()
+
+  //log("Tile is " + tileWidth + "x" + tileHeight)
+
+  var tilePosX = tileFrame.x()
+  var tilePosY = tileFrame.y()
+
+  //log("Tile is positioned at (" + tilePosX + ", " + tilePosY + ")")
+
+  var layers = tile.layers()
+
+  // keep track of how many tiles we have added so that we can skip them in the list of layers
+  var newLayerCount = 0
+
+  for (var i=0; i<layerCount; i++) {
+    // skip them the extra tiles
+    var child = layers.objectAtIndex(i + newLayerCount)
+
+    //log(child)
+
+    if (child.isMemberOfClass(MSLayerGroup)) {
+      //print("layer group -> can't be duplicated because it is clipped")
+    } else {
+      var count = tileLayer(child, tileWidth, tileHeight)
+      newLayerCount = newLayerCount + count
+    }
+
+  }
+
+};
