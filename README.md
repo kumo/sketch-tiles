@@ -31,3 +31,7 @@ Make sure you have the latest version of Sketch 3 installed.
 ## Feature requests, bugs & feedback
 
 Ping me on [twitter](http://twitter.com/kumo) or follow for updates.
+
+## Find this useful?
+
+If you find this plugin useful, consider [buying me a cake](https://paypal.me/dakegumo/5) (it goes very well with coffee!)
